@@ -1,35 +1,32 @@
 package cn.mango.community.controller;
 
-import cn.mango.community.mapper.UserMapper;
-import cn.mango.community.model.User;
+import cn.mango.community.dto.PaginationDTO;
+import cn.mango.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 @Controller
 public class IndexController {
-
     @Autowired
-    private UserMapper userMapper;
+    private QuestionService questionService;
 
     @GetMapping("/")
-    public String index(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")){
-                String token = cookie.getValue();
-                User user = userMapper.findByToken(token);
-                if (user != null) {
-                    request.getSession().setAttribute("user",user);
-                }
-                break;
-            }
-        }
+    public String index(Model model,
+                        @RequestParam(name = "page",defaultValue = "1")Integer page,
+                        @RequestParam(name = "size",defaultValue = "5")Integer size){
+        //获取分页数据，存入pagination
+        PaginationDTO pagination = questionService.list(page,size);
+        //映射到页面上
+        model.addAttribute("pagination",pagination);
         return "index";
     }
 }
+
+
+
+
+
+

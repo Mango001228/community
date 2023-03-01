@@ -43,21 +43,25 @@ public class AuthorizeController {
         accessTokenDTO.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         GithubUser githubUser = githubProvider.getUser(accessToken);
-        if(githubUser!=null){
+        //从GitHub获得用户登录后
+        if(githubUser!=null && githubUser.getId() != null){
             User user = new User();
+            //获取user中的token\name\accountId\创建时间与修改时间
+            //抽象出token代替session，以token为验证前后端登录的验证
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            //获取头像
+            user.setAvatarUrl(githubUser.getAvatarUrl());
+            //写入数据库中
             userMapper.insert(user);
             response.addCookie(new Cookie("token",token));
-            //登陆成功，写cookie 和 session
-            return "redirect:/"; //redirect返回的是路径，不是地址
         }else {
             //登陆失败，重新登录
-            return "redirect:/";
         }
+        return "redirect:/"; //redirect返回的是路径，不是地址
     }
 }
