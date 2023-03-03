@@ -5,6 +5,7 @@ import cn.mango.community.dto.GithubUser;
 import cn.mango.community.mapper.UserMapper;
 import cn.mango.community.model.User;
 import cn.mango.community.provider.GithubProvider;
+import cn.mango.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -29,7 +30,8 @@ public class AuthorizeController {
     private String redirectUri;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
+
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code")String code,
@@ -48,20 +50,20 @@ public class AuthorizeController {
             User user = new User();
             //获取user中的token\name\accountId\创建时间与修改时间
             //抽象出token代替session，以token为验证前后端登录的验证
+            /*需要返工，不懂该实现*/
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
             //获取头像
             user.setAvatarUrl(githubUser.getAvatarUrl());
             //写入数据库中
-            userMapper.insert(user);
+            userService.createOrUpdate(user);
             response.addCookie(new Cookie("token",token));
+            return "redirect:/"; //redirect返回的是路径，不是地址
         }else {
             //登陆失败，重新登录
+            return "redirect:/"; //redirect返回的是路径，不是地址
         }
-        return "redirect:/"; //redirect返回的是路径，不是地址
     }
 }
