@@ -47,5 +47,5 @@ create table question
 );
 ```
 ```bash
-mvn -Dmybatsi.generator.overwrite-true mybatis-generator:generator
+mvn '-Dmybatis.generator.overwrite=true' mybatis-generator:generate
 ```

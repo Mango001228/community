@@ -13,8 +13,13 @@ spring:
     url: jdbc:mysql://localhost:3306/community
     username: root
     password: "001228"
-#  开启驼峰功能
+# 开启驼峰功能
+# 指定POJO扫描包让mybatis自动扫描到自定义POJO
+# 映射mapper.xml文件路径
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+  type-aliases-package: cn.mango.community.model
+  mapper-locations: classpath:mapper/*.xml
+
 

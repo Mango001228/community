@@ -2,6 +2,7 @@ package cn.mango.community.interceptor;
 
 import cn.mango.community.mapper.UserMapper;
 import cn.mango.community.model.User;
+import cn.mango.community.model.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Service
 public class SessionInterceptor implements HandlerInterceptor {
@@ -24,11 +26,14 @@ public class SessionInterceptor implements HandlerInterceptor {
                 //key值是否有等于token
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                    //通过findByToken方法，获取user对象
-                    User user = userMapper.findByToken(token);
-                    //获取的user对象部不为空，登录成功
-                    if (user != null) {
-                        request.getSession().setAttribute("user", user);
+                    UserExample userExample = new UserExample();
+                    //mybatis逆向工程中的方法，等同于token=#{token}的操作
+                    userExample.createCriteria()
+                            .andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(userExample);
+                    //获取的users集合长度不为0，登录成功
+                    if (users.size()!= 0) {
+                        request.getSession().setAttribute("user", users.get(0));
                     }
                     break;
                 }
