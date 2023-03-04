@@ -1,8 +1,10 @@
 package cn.mango.community.controller;
 
+import cn.mango.community.dto.QuestionDTO;
 import cn.mango.community.mapper.QuestionMapper;
 import cn.mango.community.model.Question;
 import cn.mango.community.model.User;
+import cn.mango.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,15 +21,21 @@ public class PublishController {
 
     //自动装配
     @Autowired
-    private QuestionMapper questionMapper;
+    private QuestionService questionService;
 
     /*
     点击页面，获取到一个id，用id去question中获取到当前的问题，响应回页面
     */
     @GetMapping("/publish/{id}")
-    public String edit(@PathVariable(name = "id") Integer id){
-        Question question = questionMapper.getById(id);
-
+    public String edit(@PathVariable(name = "id") Integer id,
+                       Model model){
+        QuestionDTO question = questionService.getById(id);
+        model.addAttribute("title",question.getTitle());
+        model.addAttribute("description",question.getDescription());
+        model.addAttribute("tag",question.getTag());
+        //获取到唯一标识，避免后续修改问题变为创建新问题
+        // createOrUpdate方法需要唯一标识标记
+        model.addAttribute("id",question.getId());
         return "publish";
     }
 
@@ -41,6 +49,7 @@ public class PublishController {
             @RequestParam(value = "title",required = false) String title,
             @RequestParam(value = "description",required = false) String description,
             @RequestParam(value = "tag",required = false) String tag,
+            @RequestParam(value = "id",required = false)Integer id,
             HttpServletRequest request,
             Model model) {
         model.addAttribute("title",title);
@@ -74,9 +83,8 @@ public class PublishController {
         question.setDescription(description);
         question.setTag(tag);
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
-        questionMapper.create(question);
+        question.setId(id);
+        questionService.createOrUpdate(question);
         return "redirect:/";
     }
 }

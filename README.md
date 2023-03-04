@@ -45,6 +45,7 @@ create table question
     like_count    int default 0 null comment '点赞数',
     tag           varchar(256)  null comment '标签'
 );
-
-
+```
+```bash
+mvn -Dmybatsi.generator.overwrite-true mybatis-generator:generator
 ```

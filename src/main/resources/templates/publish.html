@@ -24,6 +24,8 @@
             <hr>
 
             <form action="/publish" method="post">
+                <!--hidden作用：表单再次提交时，属性要传过来，但是不要他在页面上显示-->
+                <input type="hidden" name="id" th:value="${id}" >
                 <div class="form-group">
                     <label for="title">问题标题（简明扼要）</label>
                     <input type="text" class="form-control" th:value="${title}" id="title" name="title"

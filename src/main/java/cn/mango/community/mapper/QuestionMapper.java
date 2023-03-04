@@ -1,10 +1,7 @@
 package cn.mango.community.mapper;
 
 import cn.mango.community.model.Question;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -33,5 +30,8 @@ public interface QuestionMapper {
 
     @Select("select * from question where id = #{id}")
     Question getById(Integer id);
+
+    @Update("update question set title = #{title}, description = #{description}, gmt_modified = #{gmtModified}, tag= #{tag} where id = #{id}")
+    void update(Question question);
 }
 
