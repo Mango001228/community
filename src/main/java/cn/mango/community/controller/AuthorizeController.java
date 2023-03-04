@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
@@ -65,5 +66,22 @@ public class AuthorizeController {
             //登陆失败，重新登录
             return "redirect:/"; //redirect返回的是路径，不是地址
         }
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        //通过request获取session并将其移除，通过response获取token（cookie）并将其移除
+        //cookie相当于银行，session相当于银行账户）
+        request.getSession().removeAttribute("user");
+        /*
+        删除已知名称的Cookie（方案：重新建立同名立即删除类型的Cookie）
+        Cookie cookie = new Cookie("username",null); 假设要删除名称未username的Cookie
+        cookie.setMaxAge(0); 立即删除型
+        response.addCookie(cookie); 重新写入覆盖之前的
+        */
+        Cookie cookie = new Cookie("token",null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
     }
 }
