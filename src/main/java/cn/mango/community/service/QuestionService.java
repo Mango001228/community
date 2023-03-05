@@ -4,6 +4,7 @@ import cn.mango.community.dto.PaginationDTO;
 import cn.mango.community.dto.QuestionDTO;
 import cn.mango.community.exception.CustomizeErrorCode;
 import cn.mango.community.exception.CustomizeException;
+import cn.mango.community.mapper.QuestionExtMapper;
 import cn.mango.community.mapper.QuestionMapper;
 import cn.mango.community.mapper.UserMapper;
 import cn.mango.community.model.Question;
@@ -22,6 +23,10 @@ public class QuestionService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
+
     @Autowired
     private UserMapper userMapper;
 
@@ -143,6 +148,21 @@ public class QuestionService {
                  throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
              }
          }
+    }
+
+    public void incView(Integer id) {
+        /*存在并发问题，别人使用时，你也在用（乐观锁&&悲观锁）
+        Question question = questionMapper.selectByPrimaryKey(id);
+        Question updateQuestion = new Question();
+        updateQuestion.setViewCount(question.getViewCount() + 1);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria()
+                        .andIdEqualTo(id);
+        questionMapper.updateByExampleSelective(updateQuestion, questionExample);*/
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
     }
 }
 
